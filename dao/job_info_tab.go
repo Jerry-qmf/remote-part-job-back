@@ -69,7 +69,7 @@ func (list JobInfoList) Less(i, j int) bool {
 	if list[i].IsTop != list[j].IsTop {
 		return list[i].IsTop
 	}
-	return list[i].CreatedAt < list[j].CreatedAt
+	return list[i].CreatedAt > list[j].CreatedAt
 }
 
 func (list JobInfoList) Swap(i, j int) {

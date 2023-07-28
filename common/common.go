@@ -42,14 +42,17 @@ func MergeImgUrls(urls []string) string {
 
 func GenFilePathAndUrl(imageName string, options ...string) (path, url string) {
 	fileName := strings.Join(options, "-")
+	if fileName != "" {
+		fileName += "-"
+	}
 	if imageName != "" {
-		fileName += "-" + imageName
+		fileName += imageName
 	} else {
-		fileName += "-" + strconv.FormatInt(time.Now().UnixNano(), 10)
+		fileName += strconv.FormatInt(time.Now().UnixNano(), 10)
 	}
 	fileName += "-" + GetRandomString(5) + ".jpg"
 	path = config.ConfigHolder.ImageRoot + "/" + fileName
-	url = config.ConfigHolder.ServiceDomain + "/api/v1/image/download?image=" + fileName
+	url = config.ConfigHolder.ServiceDomain + "/remote_part_job/api/v1/image/download?image=" + fileName
 	return
 }
 
@@ -68,16 +71,11 @@ func ConvertImageSize(inputFile string) {
 	}
 	originalSize := fileInfo.Size()
 	sizeLimit := config.ConfigHolder.ImageSizeLimit
-	ratioList := []float64{0.25, 0.3, 0.35, 0.4, 0.45, 0.55, 0.5, 0.65, 0.7, 0.75}
-	top := 20
-	for originalSize > int64(sizeLimit*1024) && top >= 0 {
-		// 计算压缩比例
-		compressionRatio := float64(sizeLimit*1024) * 0.95 / float64(originalSize)
-		if top%2 == 1 && top/2 < len(ratioList) {
-			compressionRatio = ratioList[top/2]
-		}
+
+	top := 0
+	for originalSize > int64(sizeLimit*1024) && top < 5 {
 		// 根据压缩比例调整图片质量
-		quality := fmt.Sprintf("%.0f", 100*compressionRatio)
+		quality := "90"
 
 		// 使用 convert 命令进行压缩
 		cmd := exec.Command("convert", inputFile, "-quality", quality, outputFile)
@@ -85,7 +83,10 @@ func ConvertImageSize(inputFile string) {
 		if err != nil {
 			fmt.Println("convert error: ", err)
 		}
-
-		top -= 1
+		fmt.Println("top=", top, quality, originalSize)
+		fileInfo, _ = os.Stat(inputFile)
+		originalSize = fileInfo.Size()
+		fmt.Println("top=", top, quality, originalSize)
+		top += 1
 	}
 }

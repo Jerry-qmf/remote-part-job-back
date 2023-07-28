@@ -18,16 +18,12 @@ type JobShowInfo struct {
 }
 
 type JobDetail struct {
-	JobId           string    `json:"job_id"`
-	JobTitle        string    `json:"job_title"`
-	JobPay          string    `json:"job_pay"`
-	JobLabel        string    `json:"job_label"`
-	JobDescribe     string    `json:"job_describe"`
-	JobCarouselList []string  `json:"job_carousel_list"`
-	HRContact       HRContact `json:"HR_contact"`
-}
-
-type HRContact struct {
-	WechatUrl string `json:"wechat_url"`
-	WechatNum string `json:"wechat_num"`
+	JobId           string   `json:"job_id"`
+	JobTitle        string   `json:"job_title"`
+	JobPay          string   `json:"job_pay"`
+	JobLabel        string   `json:"job_label"`
+	JobDescribe     string   `json:"job_describe"`
+	JobCarouselList []string `json:"job_carousel_list"`
+	WechatUrl       string   `json:"wechat_url"`
+	WechatNum       string   `json:"wechat_num"`
 }

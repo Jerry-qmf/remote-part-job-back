@@ -1,20 +1,20 @@
 {
   "listen_addr": "0.0.0.0:8002",
-  "image_root": "/Users/mengfei.qu/work/mini program/jerry-something/back end/jerry-something/images",
-  "image_size_limit": 80,
-  "service_domain": "127.0.0.1:8002",
+  "image_root": "/Users/mengfei.qu/work/mini_program/remote-part-time/back-end/remote-part-job-back/images",
+  "image_size_limit":60,
+  "service_domain": "https://www.something.wang",
   "log": {
     "log_level":"debug",
-    "log_folder":"/data/log/jerry-something",
-    "log_file":"jerry-something.log",
+    "log_folder":"/data/log/remote-part-job/",
+    "log_file":"remote-part-job.log",
     "max_age":7,
     "rotation_time":24,
     "is_enable_record_file_info":true
   },
   "db": {
     "driver": "mysql",
-    "database": "fashion_street_db",
-    "dsn":"root:love7758@tcp(127.0.0.1:3306)/fashion_street_db?timeout=120s&parseTime=true&loc=Local&charset=utf8mb4,utf8",
+    "database": "remote_part_job_db",
+    "dsn":"root:love7758@tcp(localhost:3306)/remote_part_job_db?timeout=120s&parseTime=true&loc=Local&charset=utf8mb4,utf8",
     "maxidleconns": 200,
     "maxopenconns": 500,
     "connmaxlifetime": 3600,

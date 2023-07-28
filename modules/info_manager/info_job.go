@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"remote-part-job-back/common"
 	"remote-part-job-back/common/errors"
 	"remote-part-job-back/common/response"
 	"remote-part-job-back/dao"
 	"strconv"
-	"strings"
 )
 
 func InfoJobList(c *gin.Context) {
@@ -86,11 +86,9 @@ func InfoJobDetail(c *gin.Context) {
 		JobPay:          info.JobPay,
 		JobLabel:        info.JobLabel,
 		JobDescribe:     info.JobDescribe,
-		JobCarouselList: strings.Split(info.JobCarouselList, ","),
-		HRContact: HRContact{
-			WechatUrl: info.WechatUrl,
-			WechatNum: info.WechatNum,
-		},
+		JobCarouselList: common.SplitImgUrls(info.JobCarouselList),
+		WechatNum:       info.WechatNum,
+		WechatUrl:       info.WechatUrl,
 	}
 	response.RespondJSON(c, nil, resp)
 }

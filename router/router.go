@@ -4,9 +4,12 @@ import (
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"jerry_something/config"
-	"jerry_something/modules/info_manager"
 	"net/http"
+	"remote-part-job-back/config"
+	"remote-part-job-back/modules/config_manager"
+	"remote-part-job-back/modules/image_manger"
+	"remote-part-job-back/modules/info_manager"
+	"remote-part-job-back/modules/storekeeper_manager"
 )
 
 var _router *gin.Engine
@@ -20,9 +23,9 @@ func InitRouter() {
 	})
 
 	info_manager.InitRouter(_router)
-	//image_manger.InitRouter(_router)
-	//config_manager.InitRouter(_router)
-	//storekeeper_manager.InitRouter(_router)
+	image_manger.InitRouter(_router)
+	config_manager.InitRouter(_router)
+	storekeeper_manager.InitRouter(_router)
 }
 
 func GetRouter() *gin.Engine {

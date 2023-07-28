@@ -35,4 +35,3 @@ func ImageUpload(c *gin.Context) {
 
 	go common.ConvertImageSize(filePath)
 }
-

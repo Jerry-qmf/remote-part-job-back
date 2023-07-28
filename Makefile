@@ -38,7 +38,7 @@ pkg:
 	chmod a+x ${EXEC}
 	cp -f script/start.sh ${DIST}/bin && chmod a+x ${DIST}/bin/start.sh
 	cp -f script/build_systemd.sh ${DIST}/bin && chmod a+x ${DIST}/bin/build_systemd.sh
-	cp -f something-live.json ${DIST}/something.json
+	cp -f config-live.json ${DIST}/config.json
 	tar -zcf ${TAR} -C dist ${VERSION_NAME}
 	@echo "build success!"
 
