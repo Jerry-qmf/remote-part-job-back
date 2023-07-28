@@ -5,7 +5,32 @@ import (
 	"remote-part-job-back/common/mysql"
 	"sort"
 	"strconv"
+	"strings"
+	"sync"
 )
+
+var (
+	jobMap  = &sync.Map{}
+	jobList JobInfoList
+)
+
+func initJobInfo() {
+	rev, err := getJobInfoList()
+	if err != nil {
+		panic("mysql init error: " + err.Error())
+	}
+	jobList = rev
+
+	for _, job := range jobList {
+		jobMap.Store(job.Id, job)
+	}
+
+	fmt.Println("mysql app info data init success!")
+}
+
+func GetJobInfoList() JobInfoList {
+	return jobList
+}
 
 func CreateJobInfo(user *JobInfo) (uint, error) {
 	db := mysql.Orm.Table(JobInfo{}.TableName()).Create(user)
@@ -14,6 +39,9 @@ func CreateJobInfo(user *JobInfo) (uint, error) {
 		//metrics.MysqlErrorInc(MysqlAppBucketInfo{}.TableName(), user.AppId, "update")
 		return 0, err
 	}
+	jobMap.Store(user.Id, *user)
+	jobList = append(jobList, *user)
+	sort.Sort(jobList)
 	//mysqlAppBucketInfoData.cache.Store(user.AppId, *user)
 	return user.Id, nil
 }
@@ -26,17 +54,24 @@ func UpdateJobInfo(user *JobInfo) error {
 		return err
 	}
 	//mysqlAppBucketInfoData.cache.Store(user.AppId, *user)
+	jobMap.Store(user.Id, *user)
+	for k, v := range jobList {
+		if v.Id == user.Id {
+			jobList[k] = *user
+		}
+	}
+	sort.Sort(jobList)
 	return nil
 }
 
 func GetJobInfoByJobId(jobId string) (*JobInfo, error) {
-	var info JobInfo
-	result := mysql.Orm.Table(JobInfo{}.TableName()).Where("id=?", jobId).First(&info)
-
-	if result.Error != nil {
-		return nil, result.Error
+	id, _ := strconv.Atoi(jobId)
+	info, ok := jobMap.Load(uint(id))
+	if !ok {
+		return nil, fmt.Errorf("没这个")
 	}
-	return &info, nil
+	rev := info.(JobInfo)
+	return &rev, nil
 }
 
 func DeleteJobInfo(id string) error {
@@ -45,11 +80,19 @@ func DeleteJobInfo(id string) error {
 		err := fmt.Errorf("job_id = " + id + " delete mysql job info db error:" + db.Error.Error())
 		return err
 	}
+	uerId, _ := strconv.Atoi(id)
 	//mysqlAppInfoData.cache.Delete(appid)
+	jobMap.Delete(uint(uerId))
+	for k, v := range jobList {
+		if v.Id == uint(uerId) {
+			jobList = append(jobList[:k], jobList[k+1:]...)
+			return nil
+		}
+	}
 	return nil
 }
 
-func GetJobInfoList() (infoList JobInfoList, err error) {
+func getJobInfoList() (infoList JobInfoList, err error) {
 	result := mysql.Orm.Table(JobInfo{}.TableName())
 	result.Find(&infoList)
 	if result.Error != nil {
@@ -60,6 +103,19 @@ func GetJobInfoList() (infoList JobInfoList, err error) {
 }
 
 type JobInfoList []JobInfo
+
+func (list JobInfoList) FilterKey(key string) JobInfoList {
+	var filteredList JobInfoList
+
+	for _, job := range list {
+		if !strings.Contains(job.JobTitle, key) && !strings.Contains(job.JobLabel, key) {
+			// 如果 jobTitle 和 jobLabel 均不包含 key，则不将其加入 filteredList
+			continue
+		}
+		filteredList = append(filteredList, job)
+	}
+	return filteredList
+}
 
 func (list JobInfoList) Len() int {
 	return len(list)

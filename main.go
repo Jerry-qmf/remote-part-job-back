@@ -5,12 +5,11 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"remote-part-job-back/common/mysql"
 	"remote-part-job-back/config"
+	"remote-part-job-back/dao"
 	"remote-part-job-back/router"
 	"sync"
 	"syscall"
-	"time"
 )
 import "flag"
 import "path/filepath"
@@ -26,7 +25,7 @@ func main() {
 	parseArgs()
 	config.Init(configPath)
 	router.InitRouter()
-	initMysql()
+	dao.Init()
 	//logs
 	//包容gin logs
 
@@ -56,17 +55,4 @@ func gracefulExitHandle() {
 		//logs.Info("received signal %v, exiting...", s)
 		os.Exit(1)
 	}()
-}
-
-func initMysql() {
-	cfg := config.ConfigHolder.DB
-	mysql.Init(&mysql.Config{
-		Driver:          cfg.Driver,
-		DataBase:        cfg.DataBase,
-		DSN:             cfg.DSN,
-		MaxIdleConns:    cfg.MaxIdleConns,
-		MaxOpenConns:    cfg.MaxOpenConns,
-		ConnMaxLifetime: time.Duration(cfg.ConnMaxLifeTime) * time.Second,
-		LogMode:         cfg.LogLevel,
-	})
 }

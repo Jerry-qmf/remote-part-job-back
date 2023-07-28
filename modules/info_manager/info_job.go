@@ -18,11 +18,16 @@ func InfoJobList(c *gin.Context) {
 		response.ErrorHandle(c, errors.InvalidParamsError(err), nil)
 	}
 
-	allInfoList, err := dao.GetJobInfoList()
-	if err != nil {
-		fmt.Printf("get job list error, err=%s \n", err.Error())
-		response.ErrorHandle(c, errors.ForbiddenError(err), nil)
-		return
+	allInfoList := dao.GetJobInfoList()
+	//if err != nil {
+	//	fmt.Printf("get job list error, err=%s \n", err.Error())
+	//	response.ErrorHandle(c, errors.ForbiddenError(err), nil)
+	//	return
+	//}
+
+	key := c.Query("key")
+	if key != "" {
+		allInfoList = allInfoList.FilterKey(key)
 	}
 
 	if len(allInfoList) == 0 {
